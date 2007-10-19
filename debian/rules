@@ -1,15 +1,29 @@
 #!/usr/bin/make -f
 #export DH_VERBOSE=1
 
+PYDEF=$(shell pyversions -d)
+PYVERS=$(shell pyversions -r)
+
 build build-indep build-arch: build-stamp
-build-stamp: $(QUILT_STAMPFN)
+build-stamp: $(PYVERS:%=build-ext-%)
 	python setup.py build
 	touch $@
 
-install: build-stamp
-	dh_testroot
+build-ext-%:
+	# Building for $*
+	dh_testdir
+	$(subst $(PYDEF),python,$*) setup.py build
+	touch $@
+
+install-clean: build-stamp
 	dh_clean -k
+
+install: install-clean $(PYVERS:%=install-ext-%)
 	python setup.py install --root $(CURDIR)/debian/python-radix
+
+install-ext-%:
+	# Installing for $*
+	$(subst $(PYDEF),python,$*) setup.py install --root $(CURDIR)/debian/python-radix
 
 binary-indep:
 
@@ -33,6 +47,6 @@ binary: binary-indep binary-arch
 clean:
 	dh_testdir
 	rm -rf build
-	dh_clean build-stamp
+	dh_clean build-stamp build-ext-*
 
 .PHONY: build build-indep build-arch clean binary binary-indep binary-arch install configure patch unpatch

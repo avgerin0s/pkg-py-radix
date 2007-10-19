@@ -2,9 +2,9 @@ Source: py-radix
 Section: python
 Priority: extra
 Maintainer: Christoph Berg <myon@debian.org>
-Build-Depends: debhelper (>> 4), python-dev (>= 2.3), python, python-central (>= 0.5)
+Build-Depends: debhelper (>> 5), python-all-dev (>= 2.3), python, python-central (>= 0.5)
 Standards-Version: 3.7.2
-XS-Python-Version: current
+XS-Python-Version: all
 
 Package: python-radix
 Section: python
