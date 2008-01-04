@@ -1,0 +1,11 @@
+py-radix (0.4-2) unstable; urgency=low
+
+  * Build extension for all python versions.
+
+ -- Christoph Berg <myon@debian.org>  Fri, 19 Oct 2007 19:17:39 +0200
+
+py-radix (0.4-1) unstable; urgency=low
+
+  * Initial version.
+
+ -- Christoph Berg <myon@debian.org>  Mon, 15 Oct 2007 21:40:39 +0200
