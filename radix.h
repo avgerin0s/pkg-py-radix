@@ -55,14 +55,30 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+/* $Id: radix.h,v 1.9 2007/10/24 06:03:08 djm Exp $ */
+
 #ifndef _RADIX_H
 #define _RADIX_H
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#if defined(_MSC_VER)
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <netdb.h>
+#endif
 
-/* $Id: radix.h,v 1.6 2005/04/03 10:02:18 djm Exp $ */
+#if defined(_MSC_VER)
+# define snprintf _snprintf
+typedef unsigned __int8		u_int8_t;
+typedef unsigned __int16	u_int16_t;
+typedef unsigned __int32	u_int32_t;
+const char *inet_ntop(int af, const void *src, char *dst, size_t size);
+size_t strlcpy(char *dst, const char *src, size_t size);
+#endif
 
 /*
  * Originally from MRT include/mrt.h
@@ -77,7 +93,6 @@ typedef struct _prefix_t {
 		struct in6_addr sin6;
 	} add;
 } prefix_t;
-typedef void (*void_fn_t)();
 
 void Deref_Prefix(prefix_t *prefix);
 
@@ -99,13 +114,16 @@ typedef struct _radix_tree_t {
 	int num_active_node;		/* for debug purpose */
 } radix_tree_t;
 
+/* Type of callback function */
+typedef void (*rdx_cb_t)(radix_node_t *, void *);
+
 radix_tree_t *New_Radix(void);
-void Destroy_Radix(radix_tree_t *radix, void_fn_t func, void *cbctx);
+void Destroy_Radix(radix_tree_t *radix, rdx_cb_t func, void *cbctx);
 radix_node_t *radix_lookup(radix_tree_t *radix, prefix_t *prefix);
 void radix_remove(radix_tree_t *radix, radix_node_t *node);
 radix_node_t *radix_search_exact(radix_tree_t *radix, prefix_t *prefix);
 radix_node_t *radix_search_best(radix_tree_t *radix, prefix_t *prefix);
-void radix_process(radix_tree_t *radix, void_fn_t func, void *cbctx);
+void radix_process(radix_tree_t *radix, rdx_cb_t func, void *cbctx);
 
 #define RADIX_MAXBITS 128
 
@@ -135,7 +153,7 @@ void radix_process(radix_tree_t *radix, void_fn_t func, void *cbctx);
 
 /* Local additions */
 
-prefix_t *prefix_pton(const char *string, long len);
+prefix_t *prefix_pton(const char *string, long len, const char **errmsg);
 prefix_t *prefix_from_blob(u_char *blob, int len, int prefixlen);
 const char *prefix_addr_ntop(prefix_t *prefix, char *buf, size_t len);
 const char *prefix_ntop(prefix_t *prefix, char *buf, size_t len);

@@ -1,10 +1,14 @@
 Source: py-radix
 Section: python
 Priority: extra
-Maintainer: Christoph Berg <myon@debian.org>
+Maintainer: Debian Python Modules Team <python-modules-team@lists.alioth.debian.org>
+Uploaders: Christoph Berg <myon@debian.org>
 Build-Depends: debhelper (>> 5), python-all-dev (>= 2.3), python, python-central (>= 0.5)
-Standards-Version: 3.7.2
+Standards-Version: 3.7.3
 XS-Python-Version: all
+Vcs-Svn: svn://svn.debian.org/svn/python-modules/packages/py-radix/trunk/
+Vcs-Browser: http://svn.debian.org/wsvn/python-modules/packages/py-radix/trunk/
+Homepage: http://www.mindrot.org/projects/py-radix/
 
 Package: python-radix
 Section: python
@@ -23,4 +27,3 @@ Description: radix tree implementation for storage of IPv4 and IPv6 networks
  lengths and allows fast lookups of containing networks. py-radix's
  implementation is built solely for networks (the data structure itself is more
  general).
-Homepage: http://www.mindrot.org/projects/py-radix/
