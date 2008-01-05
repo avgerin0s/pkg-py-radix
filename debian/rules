@@ -6,7 +6,6 @@ PYVERS=$(shell pyversions -r)
 
 build build-indep build-arch: build-stamp
 build-stamp: $(PYVERS:%=build-ext-%)
-	python setup.py build
 	touch $@
 
 build-ext-%:
@@ -14,20 +13,22 @@ build-ext-%:
 	dh_testdir
 	$(subst $(PYDEF),python,$*) setup.py build
 	touch $@
+	# ... done
 
 install-clean: build-stamp
 	dh_clean -k
 
 install: install-clean $(PYVERS:%=install-ext-%)
-	python setup.py install --root $(CURDIR)/debian/python-radix
 
-install-ext-%:
+install-ext-%: install-clean
 	# Installing for $*
 	$(subst $(PYDEF),python,$*) setup.py install --root $(CURDIR)/debian/python-radix
+	# ... done
 
 binary-indep:
 
 binary-arch: install
+	# Building .deb
 	dh_installchangelogs -a ChangeLog
 	dh_installdocs -a README
 	dh_installman -a
