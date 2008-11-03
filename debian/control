@@ -7,7 +7,7 @@ Build-Depends: debhelper (>> 5), python-all-dev (>= 2.3), python, python-central
 Standards-Version: 3.7.3
 XS-Python-Version: all
 Vcs-Svn: svn://svn.debian.org/svn/python-modules/packages/py-radix/trunk/
-Vcs-Browser: http://svn.debian.org/wsvn/python-modules/packages/py-radix/trunk/
+Vcs-Browser: http://svn.debian.org/wsvn/python-modules/packages/py-radix/trunk/?op=log
 Homepage: http://www.mindrot.org/projects/py-radix/
 
 Package: python-radix
