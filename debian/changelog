@@ -1,3 +1,16 @@
+py-radix (0.5-2) unstable; urgency=low
+
+  [ Sandro Tosi ]
+  * debian/control
+    - switch Vcs-Browser field to viewsvn
+
+  [ Christoph Berg ]
+  * Add patch by Alexander Sabourenkov to fix memory leak. Closes: #512830.
+  * Use quilt.
+  * Bump Standards-Version.
+
+ -- Christoph Berg <myon@debian.org>  Tue, 09 Jun 2009 17:42:18 +0200
+
 py-radix (0.5-1) unstable; urgency=low
 
   * New upstream version.
