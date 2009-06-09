@@ -3,8 +3,8 @@ Section: python
 Priority: extra
 Maintainer: Debian Python Modules Team <python-modules-team@lists.alioth.debian.org>
 Uploaders: Christoph Berg <myon@debian.org>
-Build-Depends: debhelper (>> 5), python-all-dev (>= 2.3), python, python-central (>= 0.5)
-Standards-Version: 3.7.3
+Build-Depends: debhelper (>> 5), python-all-dev (>= 2.3), python, python-central (>= 0.5), quilt
+Standards-Version: 3.8.1
 XS-Python-Version: all
 Vcs-Svn: svn://svn.debian.org/svn/python-modules/packages/py-radix/trunk/
 Vcs-Browser: http://svn.debian.org/viewsvn/python-modules/packages/py-radix/trunk/

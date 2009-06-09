@@ -1,11 +1,13 @@
 #!/usr/bin/make -f
 #export DH_VERBOSE=1
 
+include /usr/share/quilt/quilt.make
+
 PYDEF=$(shell pyversions -d)
 PYVERS=$(shell pyversions -r)
 
 build build-indep build-arch: build-stamp
-build-stamp: $(PYVERS:%=build-ext-%)
+build-stamp: $(PYVERS:%=build-ext-%) patch
 	touch $@
 
 build-ext-%:
@@ -45,7 +47,7 @@ binary-arch: install
 
 binary: binary-indep binary-arch
 
-clean:
+clean: unpatch
 	dh_testdir
 	rm -rf build
 	dh_clean build-stamp build-ext-*
