@@ -1,3 +1,11 @@
+py-radix (0.5-3) unstable; urgency=low
+
+  * Use dh_python2. Closes: #616954.
+  * Bump standards version, use dh 7, use 3.0 (quilt), radically strip down
+    debian/rules.
+
+ -- Christoph Berg <myon@debian.org>  Mon, 11 Jul 2011 22:51:49 +0200
+
 py-radix (0.5-2) unstable; urgency=low
 
   [ Sandro Tosi ]
