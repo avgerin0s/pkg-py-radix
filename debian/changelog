@@ -1,3 +1,9 @@
+py-radix (0.5-4) UNRELEASED; urgency=low
+
+  * Change order of dh $@ --with arguments. Thanks to KiBi for spotting.
+
+ -- Christoph Berg <myon@debian.org>  Tue, 12 Jul 2011 14:58:06 +0200
+
 py-radix (0.5-3) unstable; urgency=low
 
   * Use dh_python2. Closes: #616954.
