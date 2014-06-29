@@ -2,6 +2,7 @@ py-radix (0.5-4) UNRELEASED; urgency=low
 
   [ Christoph Berg ]
   * Change order of dh $@ --with arguments. Thanks to KiBi for spotting.
+  * Remove myself from Uploaders.
 
   [ Jakub Wilk ]
   * Use canonical URIs for Vcs-* fields.

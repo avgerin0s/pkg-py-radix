@@ -2,7 +2,6 @@ Source: py-radix
 Section: python
 Priority: extra
 Maintainer: Debian Python Modules Team <python-modules-team@lists.alioth.debian.org>
-Uploaders: Christoph Berg <myon@debian.org>
 Build-Depends: debhelper (>> 7), python-all-dev (>= 2.6.6-3~)
 Standards-Version: 3.9.2
 Vcs-Svn: svn://anonscm.debian.org/python-modules/packages/py-radix/trunk/
