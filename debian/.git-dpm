@@ -6,3 +6,6 @@
 py-radix_0.5.orig.tar.gz
 966f23493e372728f817d95b5879705e21572ed9
 20419
+debianTag="debian/%e%v"
+patchedTag="patched/%e%v"
+upstreamTag="upstream/%e%u"
