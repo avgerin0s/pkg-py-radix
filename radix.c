@@ -55,18 +55,16 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include "Python.h"
+
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <netdb.h>
 
 #include "radix.h"
 
-/* $Id: radix.c,v 1.13 2005/04/25 07:31:18 djm Exp $ */
+/* $Id: radix.c,v 1.17 2007/10/24 06:04:31 djm Exp $ */
 
 /*
  * Originally from MRT include/defs.h
@@ -108,15 +106,17 @@ static prefix_t
 	if (family == AF_INET6) {
 		default_bitlen = 128;
 		if (prefix == NULL) {
-			if ((prefix = calloc(1, sizeof(*prefix))) == NULL)
+			if ((prefix = PyMem_Malloc(sizeof(*prefix))) == NULL)
 				return (NULL);
+			memset(prefix, '\0', sizeof(*prefix));
 			dynamic_allocated++;
 		}
 		memcpy(&prefix->add.sin6, dest, 16);
 	} else if (family == AF_INET) {
 		if (prefix == NULL) {
-			if ((prefix = calloc(1, sizeof(*prefix))) == NULL)
+			if ((prefix = PyMem_Malloc(sizeof(*prefix))) == NULL)
 				return (NULL);
+			memset(prefix, '\0', sizeof(*prefix));
 			dynamic_allocated++;
 		}
 		memcpy(&prefix->add.sin, dest, 4);
@@ -154,7 +154,7 @@ Deref_Prefix(prefix_t *prefix)
 		return;
 	prefix->ref_count--;
 	if (prefix->ref_count <= 0) {
-		free(prefix);
+		PyMem_Free(prefix);
 		return;
 	}
 }
@@ -171,8 +171,9 @@ radix_tree_t
 {
 	radix_tree_t *radix;
 
-	if ((radix = calloc(1, sizeof(*radix))) == NULL)
+	if ((radix = PyMem_Malloc(sizeof(*radix))) == NULL)
 		return (NULL);
+	memset(radix, '\0', sizeof(*radix));
 
 	radix->maxbits = 128;
 	radix->head = NULL;
@@ -185,7 +186,7 @@ radix_tree_t
  * before deleting the node
  */
 static void
-Clear_Radix(radix_tree_t *radix, void_fn_t func, void *cbctx)
+Clear_Radix(radix_tree_t *radix, rdx_cb_t func, void *cbctx)
 {
 	if (radix->head) {
 		radix_node_t *Xstack[RADIX_MAXBITS + 1];
@@ -201,7 +202,7 @@ Clear_Radix(radix_tree_t *radix, void_fn_t func, void *cbctx)
 				if (Xrn->data && func)
 					func(Xrn, cbctx);
 			}
-			free(Xrn);
+			PyMem_Free(Xrn);
 			radix->num_active_node--;
 
 			if (l) {
@@ -220,17 +221,17 @@ Clear_Radix(radix_tree_t *radix, void_fn_t func, void *cbctx)
 }
 
 void
-Destroy_Radix(radix_tree_t *radix, void_fn_t func, void *cbctx)
+Destroy_Radix(radix_tree_t *radix, rdx_cb_t func, void *cbctx)
 {
 	Clear_Radix(radix, func, cbctx);
-	free(radix);
+	PyMem_Free(radix);
 }
 
 /*
  * if func is supplied, it will be called as func(node->prefix, node->data)
  */
 void
-radix_process(radix_tree_t *radix, void_fn_t func, void *cbctx)
+radix_process(radix_tree_t *radix, rdx_cb_t func, void *cbctx)
 {
 	radix_node_t *node;
 
@@ -333,11 +334,12 @@ radix_node_t
 	radix_node_t *node, *new_node, *parent, *glue;
 	u_char *addr, *test_addr;
 	u_int bitlen, check_bit, differ_bit;
-	int i, j, r;
+	u_int i, j, r;
 
 	if (radix->head == NULL) {
-		if ((node = calloc(1, sizeof(*node))) == NULL)
+		if ((node = PyMem_Malloc(sizeof(*node))) == NULL)
 			return (NULL);
+		memset(node, '\0', sizeof(*node));
 		node->bit = prefix->bitlen;
 		node->prefix = Ref_Prefix(prefix);
 		node->parent = NULL;
@@ -396,8 +398,9 @@ radix_node_t
 			node->prefix = Ref_Prefix(prefix);
 		return (node);
 	}
-	if ((new_node = calloc(1, sizeof(*new_node))) == NULL)
+	if ((new_node = PyMem_Malloc(sizeof(*new_node))) == NULL)
 		return (NULL);
+	memset(new_node, '\0', sizeof(*new_node));
 	new_node->bit = prefix->bitlen;
 	new_node->prefix = Ref_Prefix(prefix);
 	new_node->parent = NULL;
@@ -432,8 +435,9 @@ radix_node_t
 
 		node->parent = new_node;
 	} else {
-		if ((glue = calloc(1, sizeof(*glue))) == NULL)
+		if ((glue = PyMem_Malloc(sizeof(*glue))) == NULL)
 			return (NULL);
+		memset(glue, '\0', sizeof(*glue));
 		glue->bit = differ_bit;
 		glue->prefix = NULL;
 		glue->parent = node->parent;
@@ -483,7 +487,7 @@ radix_remove(radix_tree_t *radix, radix_node_t *node)
 	if (node->r == NULL && node->l == NULL) {
 		parent = node->parent;
 		Deref_Prefix(node->prefix);
-		free(node);
+		PyMem_Free(node);
 		radix->num_active_node--;
 
 		if (parent == NULL) {
@@ -510,7 +514,7 @@ radix_remove(radix_tree_t *radix, radix_node_t *node)
 			parent->parent->l = child;
 
 		child->parent = parent->parent;
-		free(parent);
+		PyMem_Free(parent);
 		radix->num_active_node--;
 		return;
 	}
@@ -523,7 +527,7 @@ radix_remove(radix_tree_t *radix, radix_node_t *node)
 	child->parent = parent;
 
 	Deref_Prefix(node->prefix);
-	free(node);
+	PyMem_Free(node);
 	radix->num_active_node--;
 
 	if (parent == NULL) {
@@ -552,37 +556,50 @@ sanitise_mask(u_char *addr, u_int masklen, u_int maskbits)
 }
 
 prefix_t
-*prefix_pton(const char *string, long len)
+*prefix_pton(const char *string, long len, const char **errmsg)
 {
 	char save[256], *cp, *ep;
 	struct addrinfo hints, *ai;
 	void *addr;
 	prefix_t *ret;
 	size_t slen;
+	int r;
 
 	ret = NULL;
 
 	/* Copy the string to parse, because we modify it */
-	if ((slen = strlen(string) + 1) > sizeof(save))
+	if ((slen = strlen(string) + 1) > sizeof(save)) {
+		*errmsg = "string too long";
 		return (NULL);
+	}
 	memcpy(save, string, slen);
 
 	if ((cp = strchr(save, '/')) != NULL) {
-		if (len != -1 )
+		if (len != -1 ) {
+			*errmsg = "masklen specified twice";
 			return (NULL);
+		}
 		*cp++ = '\0';
 		len = strtol(cp, &ep, 10);
-		if (*cp == '\0' || *ep != '\0' || len < 0)
+		if (*cp == '\0' || *ep != '\0' || len < 0) {
+			*errmsg = "could not parse masklen";
 			return (NULL);
+		}
 		/* More checks below */
 	}
 	memset(&hints, '\0', sizeof(hints));
 	hints.ai_flags = AI_NUMERICHOST;
 
-	if (getaddrinfo(save, NULL, &hints, &ai) != 0)
-		return (NULL);
-	if (ai == NULL || ai->ai_addr == NULL)
-		return (NULL);
+	if ((r = getaddrinfo(save, NULL, &hints, &ai)) != 0) {
+		snprintf(save, sizeof(save), "getaddrinfo: %s:",
+		    gai_strerror(r));
+		*errmsg = save;
+		return NULL;
+	}
+	if (ai == NULL || ai->ai_addr == NULL) {
+		*errmsg = "getaddrinfo returned no result";
+		goto out;
+	}
 	switch (ai->ai_addr->sa_family) {
 	case AF_INET:
 		if (len == -1)
@@ -605,6 +622,8 @@ prefix_t
 	}
 
 	ret = New_Prefix2(ai->ai_addr->sa_family, addr, len, NULL);
+	if (ret == NULL)
+		*errmsg = "New_Prefix2 failed";
 out:
 	freeaddrinfo(ai);
 	return (ret);

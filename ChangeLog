@@ -1,3 +1,21 @@
+20071218
+ - (djm) Implement pickle protocol via __reduce__ and __setstate__, inspired
+   by wrapper from Erik Curiel (ecuriel AT kefta.com)
+ - (djm) Crank version number to 0.5
+ - (djm) Make this compile on Python 2.4, which lacks Py_ssize_t
+
+20071010
+- (djm) fix for Windows platforms: WSAStartup was not called, resulting
+  in failures inside getaddrinfo. Report from harpreet.sawhney AT gmail.com
+
+20060808
+ - (djm) Support for Win32 (AF_INET6 is still broken though)
+
+20060628
+ - (djm) Add RPM spec file
+ - (djm) Hygene fixes: be more strict with types, use Python memory
+   allocators instead of libc malloc/free
+
 20050425
  - (djm) Fix bug that could corrupt some prefixes; reported by 
    siganos AT cs.ucr.edu
@@ -57,4 +75,4 @@
  - (djm) Start the changelog
  - (djm) Release alpha version: py-radix-0.1
 
-$Id: ChangeLog,v 1.33 2005/04/25 07:34:41 djm Exp $
+$Id: ChangeLog,v 1.39 2007/12/18 02:49:01 djm Exp $

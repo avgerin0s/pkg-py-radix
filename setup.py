@@ -14,17 +14,20 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-# $Id: setup.py,v 1.5 2005/04/25 07:34:41 djm Exp $
+# $Id: setup.py,v 1.7 2007/12/18 00:53:53 djm Exp $
 
 import sys
 from distutils.core import setup, Extension
 
-VERSION = "0.4"
+VERSION = "0.5"
 
 if __name__ == '__main__':
-	radix = Extension('radix',
-		define_macros = [('PROGVER', '"' + VERSION + '"')],
-		sources = ['radix.c', 'radix_python.c'])
+	libs = []
+	src = [ 'radix.c', 'radix_python.c' ]
+	if sys.platform == 'win32':
+		libs += [ 'ws2_32' ]
+		src += [ 'inet_ntop.c', 'strlcpy.c' ]
+	radix = Extension('radix', libraries = libs, sources = src)
 	setup(	name = "radix",
 		version = VERSION,
 		author = "Damien Miller",
