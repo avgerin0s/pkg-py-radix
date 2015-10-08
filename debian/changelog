@@ -1,3 +1,14 @@
+py-radix (0.5-4) UNRELEASED; urgency=low
+
+  [ Christoph Berg ]
+  * Change order of dh $@ --with arguments. Thanks to KiBi for spotting.
+  * Remove myself from Uploaders.
+
+  [ Jakub Wilk ]
+  * Use canonical URIs for Vcs-* fields.
+
+ -- Jakub Wilk <jwilk@debian.org>  Sun, 05 May 2013 16:01:33 +0200
+
 py-radix (0.5-3) unstable; urgency=low
 
   * Use dh_python2. Closes: #616954.
