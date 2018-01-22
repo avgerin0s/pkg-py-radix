@@ -1,2 +1,2 @@
 version=3
-http://www.mindrot.org/files/py-radix/py-radix-(.*).tar.gz
+https://github.com/mjschultz/py-radix/archive .*/v([\d.]+)\.tar\.gz
