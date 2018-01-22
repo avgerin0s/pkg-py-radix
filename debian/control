@@ -2,6 +2,7 @@ Source: py-radix
 Section: python
 Priority: optional
 Maintainer: Debian Python Modules Team <python-modules-team@lists.alioth.debian.org>
+Uploaders: Aggelos Avgerinos <evaggelos.avgerinos@gmail.com>
 Build-Depends: debhelper (>= 10),
                dh-python,
                python-all-dev (>= 2.6.6-3~),
