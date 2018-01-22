@@ -55,7 +55,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: radix.h,v 1.9 2007/10/24 06:03:08 djm Exp $ */
+/* $Id$ */
 
 #ifndef _RADIX_H
 #define _RADIX_H
@@ -63,6 +63,7 @@
 #if defined(_MSC_VER)
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#pragma comment(lib,"ws2_32.lib")
 #else
 # include <sys/types.h>
 # include <sys/socket.h>
@@ -73,10 +74,9 @@
 
 #if defined(_MSC_VER)
 # define snprintf _snprintf
-typedef unsigned __int8		u_int8_t;
-typedef unsigned __int16	u_int16_t;
-typedef unsigned __int32	u_int32_t;
-const char *inet_ntop(int af, const void *src, char *dst, size_t size);
+typedef unsigned __int8         u_int8_t;
+typedef unsigned __int16        u_int16_t;
+typedef unsigned __int32        u_int32_t;
 size_t strlcpy(char *dst, const char *src, size_t size);
 #endif
 
@@ -85,13 +85,13 @@ size_t strlcpy(char *dst, const char *src, size_t size);
  * $MRTId: mrt.h,v 1.1.1.1 2000/08/14 18:46:10 labovit Exp $
  */
 typedef struct _prefix_t {
-	u_int family;			/* AF_INET | AF_INET6 */
-	u_int bitlen;			/* same as mask? */
-	int ref_count;			/* reference count */
-	union {
-		struct in_addr sin;
-		struct in6_addr sin6;
-	} add;
+        u_int family;                   /* AF_INET | AF_INET6 */
+        u_int bitlen;                   /* same as mask? */
+        int ref_count;                  /* reference count */
+        union {
+                struct in_addr sin;
+                struct in6_addr sin6;
+        } add;
 } prefix_t;
 
 void Deref_Prefix(prefix_t *prefix);
@@ -101,60 +101,90 @@ void Deref_Prefix(prefix_t *prefix);
  * $MRTId: radix.h,v 1.1.1.1 2000/08/14 18:46:10 labovit Exp $
  */
 typedef struct _radix_node_t {
-	u_int bit;			/* flag if this node used */
-	prefix_t *prefix;		/* who we are in radix tree */
-	struct _radix_node_t *l, *r;	/* left and right children */
-	struct _radix_node_t *parent;	/* may be used */
-	void *data;			/* pointer to data */
+        u_int bit;                      /* flag if this node used */
+        prefix_t *prefix;               /* who we are in radix tree */
+        struct _radix_node_t *l, *r;    /* left and right children */
+        struct _radix_node_t *parent;   /* may be used */
+        void *data;                     /* pointer to data */
 } radix_node_t;
 
 typedef struct _radix_tree_t {
-	radix_node_t *head;
-	u_int maxbits;			/* for IP, 32 bit addresses */
-	int num_active_node;		/* for debug purpose */
+        radix_node_t *head_ipv4;
+        radix_node_t *head_ipv6;
+        int num_active_node;            /* for debug purpose */
 } radix_tree_t;
 
 /* Type of callback function */
 typedef void (*rdx_cb_t)(radix_node_t *, void *);
+typedef int (*rdx_search_cb_t)(radix_node_t *, void *);
 
 radix_tree_t *New_Radix(void);
 void Destroy_Radix(radix_tree_t *radix, rdx_cb_t func, void *cbctx);
+void Clear_Radix(radix_tree_t *radix, rdx_cb_t func, void *cbctx);
 radix_node_t *radix_lookup(radix_tree_t *radix, prefix_t *prefix);
 void radix_remove(radix_tree_t *radix, radix_node_t *node);
+radix_node_t *radix_search_node(radix_tree_t *radix, prefix_t *prefix);
 radix_node_t *radix_search_exact(radix_tree_t *radix, prefix_t *prefix);
 radix_node_t *radix_search_best(radix_tree_t *radix, prefix_t *prefix);
+radix_node_t *radix_search_best2(radix_tree_t *radix, prefix_t *prefix, int inclusive);
+radix_node_t *radix_search_worst(radix_tree_t *radix, prefix_t *prefix);
+radix_node_t *radix_search_worst2(radix_tree_t *radix, prefix_t *prefix, int inclusive);
+int radix_search_covering(radix_tree_t *radix, prefix_t *prefix, rdx_search_cb_t func, void *cbctx);
+int radix_search_covered(radix_tree_t *radix, prefix_t *prefix, rdx_search_cb_t func, void *cbctx, int inclusive);
+int radix_search_intersect(radix_tree_t *radix, prefix_t *prefix, rdx_search_cb_t func, void *cbctx);
 void radix_process(radix_tree_t *radix, rdx_cb_t func, void *cbctx);
 
 #define RADIX_MAXBITS 128
 
 #define RADIX_WALK(Xhead, Xnode) \
-	do { \
-		radix_node_t *Xstack[RADIX_MAXBITS+1]; \
-		radix_node_t **Xsp = Xstack; \
-		radix_node_t *Xrn = (Xhead); \
-		while ((Xnode = Xrn)) { \
-			if (Xnode->prefix)
+        do { \
+                radix_node_t *Xstack[RADIX_MAXBITS+1]; \
+                radix_node_t **Xsp = Xstack; \
+                radix_node_t *Xrn = (Xhead); \
+                while ((Xnode = Xrn)) { \
+                        if (Xnode->prefix)
 
 #define RADIX_WALK_END \
-			if (Xrn->l) { \
-				if (Xrn->r) { \
-					*Xsp++ = Xrn->r; \
-				} \
-				Xrn = Xrn->l; \
-			} else if (Xrn->r) { \
-				Xrn = Xrn->r; \
-			} else if (Xsp != Xstack) { \
-				Xrn = *(--Xsp); \
-			} else { \
-				Xrn = (radix_node_t *) 0; \
-			} \
-		} \
-	} while (0)
+                        if (Xrn->l) { \
+                                if (Xrn->r) { \
+                                        *Xsp++ = Xrn->r; \
+                                } \
+                                Xrn = Xrn->l; \
+                        } else if (Xrn->r) { \
+                                Xrn = Xrn->r; \
+                        } else if (Xsp != Xstack) { \
+                                Xrn = *(--Xsp); \
+                        } else { \
+                                Xrn = (radix_node_t *) 0; \
+                        } \
+                } \
+        } while (0)
+
+#define RADIX_TREE_WALK(Xtree, Xnode) \
+        do { \
+                radix_node_t *Xheads[] = { \
+                        (Xtree)->head_ipv4, \
+                        (Xtree)->head_ipv6, \
+                }; \
+                radix_node_t **Xpnode = &Xnode; \
+                unsigned Xi; \
+                for (Xi = 0; Xi < sizeof(Xheads) / sizeof(Xheads[0]); Xi++) { \
+                        RADIX_WALK(Xheads[Xi], Xnode)
+
+#define RADIX_TREE_WALK_END \
+                        RADIX_WALK_END; \
+                        if (*Xpnode) \
+                                break; \
+                } \
+        } while (0)
+
 
 /* Local additions */
 
 prefix_t *prefix_pton(const char *string, long len, const char **errmsg);
 prefix_t *prefix_from_blob(u_char *blob, int len, int prefixlen);
+prefix_t *prefix_pton_ex(prefix_t *prefix, const char *string, long len, const char **errmsg);
+prefix_t *prefix_from_blob_ex(prefix_t *prefix, u_char *blob, int len, int prefixlen);
 const char *prefix_addr_ntop(prefix_t *prefix, char *buf, size_t len);
 const char *prefix_ntop(prefix_t *prefix, char *buf, size_t len);
 
