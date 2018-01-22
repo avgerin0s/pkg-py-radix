@@ -1,4 +1,4 @@
-py-radix (0.5-4) UNRELEASED; urgency=low
+py-radix (0.9.7-1) UNRELEASED; urgency=low
 
   [ Christoph Berg ]
   * Change order of dh $@ --with arguments. Thanks to KiBi for spotting.
@@ -10,7 +10,10 @@ py-radix (0.5-4) UNRELEASED; urgency=low
   [ Ondřej Nový ]
   * Fixed VCS URL (https)
 
- -- Jakub Wilk <jwilk@debian.org>  Sun, 05 May 2013 16:01:33 +0200
+  [ Aggelos Avgerinos ]
+  * new upstream version
+
+ -- Aggelos Avgerinos <evaggelos.avgerinos@gmail.com>  Mon, 22 Jan 2018 10:50:03 +0200
 
 py-radix (0.5-3) unstable; urgency=low
 
