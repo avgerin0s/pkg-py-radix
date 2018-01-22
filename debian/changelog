@@ -1,4 +1,4 @@
-py-radix (0.9.7-1) UNRELEASED; urgency=low
+py-radix (0.9.7-1) unstable; urgency=low
 
   [ Christoph Berg ]
   * Change order of dh $@ --with arguments. Thanks to KiBi for spotting.
@@ -11,7 +11,17 @@ py-radix (0.9.7-1) UNRELEASED; urgency=low
   * Fixed VCS URL (https)
 
   [ Aggelos Avgerinos ]
-  * new upstream version
+  * Add myself to Uploaders (Closes: #753271)
+  * New upstream version
+  * Update standards version to 4.1.3; no changes needed
+  * Update debhelper and compat version to 10; no changes needed
+  * Provide python3 package
+    + Add python3 and pybuild dh arguments
+    + Add package definition in d/control
+  * Remove patch from #512830 since it has been merged to upstream.
+  * Enable all hardening features
+  * Change priority from extra to optional
+  * Change d/watch to point to Github
 
  -- Aggelos Avgerinos <evaggelos.avgerinos@gmail.com>  Mon, 22 Jan 2018 10:50:03 +0200
 
