@@ -1,6 +1,6 @@
 Source: py-radix
 Section: python
-Priority: extra
+Priority: optional
 Maintainer: Debian Python Modules Team <python-modules-team@lists.alioth.debian.org>
 Build-Depends: debhelper (>= 10),
                dh-python,
