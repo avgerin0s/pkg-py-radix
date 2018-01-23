@@ -1,26 +1,41 @@
-py-radix is an implementation of a radix tree data structure for the storage 
-and retrieval of IPv4 and IPv6 network prefixes.
+py-radix
+========
 
-The radix tree is the data structure most commonly used for routing table 
-lookups. It efficiently stores network prefixes of varying lengths and 
-allows fast lookups of containing networks.
+.. image:: https://travis-ci.org/mjschultz/py-radix.svg?branch=master
+   :target: https://travis-ci.org/mjschultz/py-radix
 
-To install, use the standard Python distutils incantation:
+.. image:: https://coveralls.io/repos/mjschultz/py-radix/badge.png?branch=master
+   :target: https://coveralls.io/r/mjschultz/py-radix?branch=master
+
+py-radix implements the radix tree data structure for the storage and
+retrieval of IPv4 and IPv6 network prefixes.
+
+The radix tree is commonly used for routing table lookups. It efficiently
+stores network prefixes of varying lengths and allows fast lookups of
+containing networks.
+
+Installation
+------------
+
+Installation is a breeze via pip: ::
+
+    pip install py-radix
+
+Or with the standard Python distutils incantation: ::
 
 	python setup.py build
 	python setup.py install
 
-Regression tests are in the test.py file.
+The C extension will be built for supported python versions. If you do not
+want the C extension, set the environment variable ``RADIX_NO_EXT=1``.
 
-py-radix is licensed under a ISC/BSD licence. The underlying radix tree 
-implementation is taken (and modified) from MRTd and is subject to a 4-term 
-BSD license. See the LICENSE file for details.
+Tests are in the ``tests/`` directory and can be run with
+``python setup.py nosetests``.
 
-Please report bugs to Damien Miller <djm@mindrot.org>. Please check the TODO
-file first, in case your problem is something I already know about (please
-send patches!)
+Usage
+-----
 
-A simple example that demonstrates most of the features:
+A simple example that demonstrates most of the features: ::
 
 	import radix
 
@@ -60,6 +75,15 @@ A simple example that demonstrates most of the features:
 	# that contains the search term (routing-style lookup)
 	rnode = rtree.search_best("10.123.45.6")
 
+	# Worst-search will return the shortest matching prefix
+	# that contains the search term (inverse routing-style lookup)
+	rnode = rtree.search_worst("10.123.45.6")
+
+	# Covered search will return all prefixes inside the given
+	# search term, as a list (including the search term itself,
+	# if present in the tree)
+	rnodes = rtree.search_covered("10.123.0.0/16")
+
 	# There are a couple of implicit members of a RadixNode:
 	print rnode.network	# -> "10.0.0.0"
 	print rnode.prefix	# -> "10.0.0.0/8"
@@ -74,7 +98,7 @@ A simple example that demonstrates most of the features:
 	# Use the nodes() method to return all RadixNodes created
 	nodes = rtree.nodes()
 	for rnode in nodes:
-  		print rnode.prefix
+		print rnode.prefix
 
 	# The prefixes() method will return all the prefixes (as a
 	# list of strings) that have been entered
@@ -90,4 +114,25 @@ A simple example that demonstrates most of the features:
   		print rnode.prefix
 
 
-$Id: README,v 1.12 2004/11/24 20:46:18 djm Exp $
+License
+-------
+
+py-radix is licensed under a ISC/BSD licence. The underlying radix tree 
+implementation is taken (and modified) from MRTd and is subject to a 4-term 
+BSD license. See the LICENSE file for details.
+
+Contributing
+------------
+
+Please report bugs via GitHub at https://github.com/mjschultz/py-radix/issues.
+Code changes can be contributed through a pull request on GitHub or emailed
+directly to me <mjschultz@gmail.com>.
+
+The main portions of the directory tree are as follows: ::
+
+    .
+    ├── radix/*.py      # Pure Python code
+    ├── radix/_radix.c  # C extension code (compatible with pure python code)
+    ├── radix/_radix/*  # C extension code (compatible with pure python code)
+    ├── tests/          # Tests (regression and unit)
+    └── setup.py        # Standard setup.py for installation/testing/etc.
