@@ -1,4 +1,4 @@
-py-radix (0.5-4) UNRELEASED; urgency=low
+py-radix (0.10.0-1) unstable; urgency=medium
 
   [ Christoph Berg ]
   * Change order of dh $@ --with arguments. Thanks to KiBi for spotting.
@@ -10,7 +10,21 @@ py-radix (0.5-4) UNRELEASED; urgency=low
   [ Ondřej Nový ]
   * Fixed VCS URL (https)
 
- -- Jakub Wilk <jwilk@debian.org>  Sun, 05 May 2013 16:01:33 +0200
+  [ Aggelos Avgerinos ]
+  * d/control: Add myself to uploaders (Closes: #753271)
+  * New upstream release
+  * d/patches: Drop memleak patch since it has been merged to upstream
+  * d/watch: Change upstream to pypi
+  * Bump standards version; no changes needed
+  * Bump compat and debhelper versions; no changes needed
+  * Add python3 binary package
+    + Add python3 and pybuild dh arguments
+    + Add package definition in d/control
+  * d/docs: Change doc from README -> README.rst
+  * d/rules: Build with all hardening features enabled
+  * d/control: Change priority from extra to optional
+
+ -- Aggelos Avgerinos <evaggelos.avgerinos@gmail.com>  Tue, 23 Jan 2018 11:00:24 +0200
 
 py-radix (0.5-3) unstable; urgency=low
 
