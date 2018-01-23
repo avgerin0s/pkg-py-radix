@@ -1,47 +1,61 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2004 Damien Miller <djm@mindrot.org>
-#
-# Permission to use, copy, modify, and distribute this software for any
-# purpose with or without fee is hereby granted, provided that the above
-# copyright notice and this permission notice appear in all copies.
-#
-# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-# $Id: setup.py,v 1.7 2007/12/18 00:53:53 djm Exp $
-
+import codecs
 import sys
-from distutils.core import setup, Extension
+import os
 
-VERSION = "0.5"
+from setuptools import setup, find_packages, Extension
+from os.path import abspath, dirname, join
 
-if __name__ == '__main__':
-	libs = []
-	src = [ 'radix.c', 'radix_python.c' ]
-	if sys.platform == 'win32':
-		libs += [ 'ws2_32' ]
-		src += [ 'inet_ntop.c', 'strlcpy.c' ]
-	radix = Extension('radix', libraries = libs, sources = src)
-	setup(	name = "radix",
-		version = VERSION,
-		author = "Damien Miller",
-		author_email = "djm@mindrot.org",
-		url = "http://www.mindrot.org/py-radix.html",
-		description = "Radix tree implementation",
-		long_description = """\
-py-radix is an implementation of a radix tree data structure for the storage 
-and retrieval of IPv4 and IPv6 network prefixes.
+here = abspath(dirname(__file__))
 
-The radix tree is the data structure most commonly used for routing table 
-lookups. It efficiently stores network prefixes of varying lengths and 
-allows fast lookups of containing networks.
-""",
-		license = "BSD",
-		ext_modules = [radix]
-	     )
+# determine the python version
+IS_PYPY = hasattr(sys, 'pypy_version_info')
+RADIX_NO_EXT = os.environ.get('RADIX_NO_EXT', '0')
+RADIX_NO_EXT = True if RADIX_NO_EXT not in ('0', 'false', 'False') else False
+
+with codecs.open(join(here, 'README.rst'), encoding='utf-8') as f:
+    README = f.read()
+
+# introduce some extra setup_args if Python 2.x
+extra_kwargs = {}
+if not IS_PYPY and not RADIX_NO_EXT:
+    sources = ['radix/_radix.c', 'radix/_radix/radix.c']
+    radix = Extension('radix._radix',
+                      sources=sources,
+                      include_dirs=[join(here, 'radix')])
+    extra_kwargs['ext_modules'] = [radix]
+
+
+tests_require = ['nose', 'coverage']
+if sys.version_info < (2, 7):
+    tests_require.append('unittest2')
+
+
+setup(
+    name='py-radix',
+    version='0.10.0',
+    maintainer='Michael J. Schultz',
+    maintainer_email='mjschultz@gmail.com',
+    url='https://github.com/mjschultz/py-radix',
+    description='Radix tree implementation',
+    long_description=README,
+    license='BSD',
+    keywords='radix tree trie python routing networking',
+    classifiers=[
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: System :: Networking',
+        'License :: OSI Approved :: BSD License',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+    ],
+    tests_require=tests_require,
+    packages=find_packages(exclude=['tests', 'tests.*']),
+    test_suite='nose.collector',
+    **extra_kwargs
+)
